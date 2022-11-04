@@ -11,16 +11,6 @@ then
   exit 255
 fi
 
-if [ -n "$AWS_SESSION_TOKEN" ]
-then
-  echo "Session token found.  This can not be used to generate a new token.
-   unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-and then ensure you have a profile with the normal access key credentials or
-set the variables to the normal keys.
-" >&2
-  exit 255
-fi
-
 identity=$(aws sts get-caller-identity)
 username=$(echo -- "$identity" | sed -n 's!.*"arn:aws:iam::.*:user/\(.*\)".*!\1!p')
 if [ -z "$username" ]
@@ -68,9 +58,17 @@ $tokens" >&2
   exit 255
 fi
 
-echo export AWS_PROFILE=$AWS_PROFILE
-echo export AWS_SESSION_TOKEN=$session
-echo export AWS_SECRET_ACCESS_KEY=$secret
-echo export AWS_ACCESS_KEY_ID=$access
+echo 'Removing old mfa setting'
+sed -i '' '/mfa/,$d' ~/.aws/credentials
+
+echo 'Push new mfa token, key, id to credentials'
+echo AWS_SESSION_TOKEN=$session
+echo AWS_SECRET_ACCESS_KEY=$secret
+echo AWS_ACCESS_KEY_ID=$access
+
+echo [mfa] >> ~/.aws/credentials
+echo AWS_SESSION_TOKEN=$session >> ~/.aws/credentials
+echo AWS_SECRET_ACCESS_KEY=$secret >> ~/.aws/credentials
+echo AWS_ACCESS_KEY_ID=$access >> ~/.aws/credentials
 
 echo Keys valid until $expire >&2
