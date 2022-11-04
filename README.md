@@ -18,7 +18,7 @@ and then calls the `eval` command
 EXAMPLE
 
     % getaws gcsf
-    You are: sweharris
+    You are: chris
     Your MFA device is: arn:aws:iam::123456789012:mfa/sweharris
     Enter your MFA code now: 299255
     Keys valid until 2017-11-04T02:12:13Z
